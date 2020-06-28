@@ -1,16 +1,19 @@
 import "@babel/polyfill";
-import Timer from './timer';
+import EmailParser from "./emailParser";
+import watchObj from "./watchObj";
 
-window.addEventListener('load', function(){
-    let timer1 = new Timer(document.querySelector('.timer1'), 10);
+let parser = new EmailParser('info@eztec.ru');
+console.log(parser.name);
+
+let div = document.createElement('div');
+document.body.appendChild(div);
+
+let cleverDiv = watchObj(div, function(prop, val){
+    console.log(prop, val);
 });
 
-import {wordsCount, getWords} from './stringer';
 
-let string = '  Всем  привет! Ура ура! ';
-
-console.log( wordsCount(string) );
-
-for ( let word of getWords(string)) {
-    console.log(word);
-}
+cleverDiv.innerHTML = '<strong>HTML</strong><em>Changed</em>';
+cleverDiv.style.color = "red";
+cleverDiv.style.fontSize = "25px";
+cleverDiv.querySelector('em').style.color = 'green';

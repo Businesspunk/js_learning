@@ -1,11 +1,10 @@
-function trimString( string ){
+function trimString(string){
     return string.replace(/\s+/g, ' ').trim();
     
 }
 
-export function wordsCount( str ){
+function wordsCount(str){
     str = trimString(str);
-
     let counter = 0;
 
     for ( let symbol of str) {
@@ -19,12 +18,13 @@ export function wordsCount( str ){
     return counter;
 }
 
-export function* getWords( str ){
+function* getWords( str ){
     str = trimString(str);
 
     let words = str.split(' ');
     for( let i = 0; i < words.length; i++){
         yield words[i];
     }
-
 }
+
+export {wordsCount, getWords };
