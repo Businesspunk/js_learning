@@ -1,3 +1,5 @@
+/* eslint no-use-before-define: 0 */
+
 let path = require('path');
 
 let conf = {
