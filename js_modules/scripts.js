@@ -1,19 +1,24 @@
 import "@babel/polyfill";
-import EmailParser from "./emailParser";
-import watchObj from "./watchObj";
+import * as ArticlesModel from './articles';
 
-let parser = new EmailParser('info@eztec.ru');
-console.log(parser.name);
+async function ArticlesProcess()
+{
 
-let div = document.createElement('div');
-document.body.appendChild(div);
+    let articles = await ArticlesModel.all();
+    console.log('articles count = ' + articles.length);
 
-let cleverDiv = watchObj(div, function(prop, val){
-    console.log(prop, val);
-});
+    let ind = Math.floor(Math.random() * articles.length);
+    console.log('select index ' + ind + ', id = ' + articles[ind].id);
 
+    let statusDeleting = await ArticlesModel.remove(ind);
+    console.log('что с удалением? - ' + statusDeleting);
 
-cleverDiv.innerHTML = '<strong>HTML</strong><em>Changed</em>';
-cleverDiv.style.color = "red";
-cleverDiv.style.fontSize = "25px";
-cleverDiv.querySelector('em').style.color = 'green';
+    articles = await ArticlesModel.all();
+    return articles;
+}
+
+ArticlesProcess().then( ( articles ) => {
+    console.log('articles count = ' + articles.length); 
+}, (e) => {
+    console.log(e);
+} ).catch( () => { console.log(2) } )
