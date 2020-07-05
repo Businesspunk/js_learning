@@ -1,48 +1,31 @@
 import * as serverApi from './db';
 
 async function all(){
-    return new Promise(( resolve, reject )=> {
-        serverApi.all().then( (response) => {
-            let info = JSON.parse(response);
-            if(info.code === 200){
-                resolve(info.data);
-            }
-            else{
-                reject(info.status);
-            }
-        }, (e) => { reject( e ) }).catch( (e) => { console.log(e, "catch error") } );
-    })
+    let response = await serverApi.all();
+    return parseResponse(response);
 }
 
 async function one(id){
-    return new Promise( ( resolve, reject ) => {
-        serverApi.get(id).then( (response) => {
-            let info = JSON.parse(response);
-    
-            if(info.code === 200){
-                resolve(info.data);
-            }
-            else{
-                reject(info.status);
-            }
-        }, (e) => { reject(e); });
-    } );
-    
+    let response = await serverApi.get(id);
+    return parseResponse(response);
 }
 
 async function remove(id){
-    return new Promise( (resolve, reject) => {
-        serverApi.remove(id).then( (response) => {
-            let info = JSON.parse(response);
-    
-            if(info.code === 200){
-                resolve(info.data);
-            }
-            else{
-                reject(info.status);
-            }
-        }, (e) => { reject(e) } );
-    })
+    let response = await serverApi.remove(id);
+    return parseResponse(response);
 }
 
 export {all, one, remove};
+
+function parseResponse( text ){
+    try{
+        let info = JSON.parse(text);
+        if( info.code !== 200 ){
+            throw new Error("Code is't 200");
+        }
+        return info.data;
+    }catch{
+        throw new Error("Incorrect form server")
+    }
+    
+}
