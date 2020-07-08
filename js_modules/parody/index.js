@@ -11,6 +11,11 @@ class Parody{
         this.targetNode = null;
     }
 
+    test()
+    {
+        console.log(1);
+    }
+
     bindMount(selector)
     {
         this.isMount = true;
@@ -26,6 +31,20 @@ class Parody{
         }
 
         return node;
+    }
+
+    watchObj( element, callback )
+    {
+        return new Proxy( element, {
+            set( target, name, value ){
+                target[name] = value;
+                callback( name, value );
+                return true;
+            },
+            get(target, name){
+                return target[name];
+            }
+        } )
     }
 }
 

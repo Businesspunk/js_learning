@@ -14,12 +14,16 @@ class Cart extends Parody{
                 { max: 5, price: 20, current: 2 }
             ] 
         }
+
+        this.state.products.forEach((item, i) => {
+            this.state.products[i] = this.watchObj( item, () => { this.render(); } );
+        });
+        
     }
 
     onChange( i, value )
     {
         this.state.products[i].current = value;
-        this.render();
     }
 
     render()
