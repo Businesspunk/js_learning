@@ -1,4 +1,5 @@
-import Parody from '../parody/index';
+// eslint-disable-next-line no-unused-vars
+import {Parody, ParodyDom} from '../parody';
 
 class InputNumber extends Parody
 {
