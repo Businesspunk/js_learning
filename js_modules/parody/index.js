@@ -11,9 +11,9 @@ class Parody{
         this.targetNode = null;
     }
 
-    test()
+    initProxy( obj )
     {
-        console.log(1);
+        this.state = watchObj(obj, this.render.bind(this));
     }
 
     bindMount(selector)
@@ -32,20 +32,6 @@ class Parody{
 
         return node;
     }
-
-    watchObj( element, callback )
-    {
-        return new Proxy( element, {
-            set( target, name, value ){
-                target[name] = value;
-                callback( name, value );
-                return true;
-            },
-            get(target, name){
-                return target[name];
-            }
-        } )
-    }
 }
 
 function ParodyDom( tag, props, ...children )
@@ -53,22 +39,67 @@ function ParodyDom( tag, props, ...children )
     if(typeof tag === "function"){
         return (new tag(props)).render();
     }
-    
-    let node = document.createElement(tag);
 
-    children.forEach((child) => {
+    function addChild(child) {
+
         if(child instanceof HTMLElement){
             node.appendChild(child);
+        }else if( typeof child === "object" ){
+            for( let item of child ){
+                addChild(item);
+            }
         }
         else{
             let textNode = document.createTextNode(child);
             node.appendChild(textNode);
         }
-    });
+    }
+
+    let node = document.createElement(tag);
+
+    children.forEach(addChild);
 
     Object.assign(node, props); 
     
     return node;
 }
 
-export {ParodyDom, Parody};
+function watchObj( element, callback )
+{
+    let reactiveFunctions = {
+        push: true,
+        pop: true,
+        splice: true,
+        slice: true,
+        shift: true,
+        unshift: true,
+        sort: true
+    };
+    
+    return new Proxy( element, {
+        get(target, name){
+            if(typeof target[name] === "function"){
+                if(name in reactiveFunctions){
+                    return function(...args){
+                        let res = target[name].apply(target, args);
+                        callback();
+                        return res;
+                    }
+                }
+                else{
+                    return target[name].bind(target);
+                }
+            }
+
+            return watchObj(target[name], callback);
+            
+        },
+        set( target, name, value ){
+            target[name] = value;
+            callback( name, value );
+            return true;
+        }
+    } )
+}
+
+export {ParodyDom, Parody, watchObj};
