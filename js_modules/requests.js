@@ -1,0 +1,22 @@
+function makeRequest( route, args = {} )
+{
+    return fetch(`https://jsonplaceholder.typicode.com/${route}`, args).then( (response) => {
+        
+        if( response.status !== 200 && response.status !==201 ){
+            throw new Error("Code isn't 200");
+        }
+        try {
+            var result = response.json();
+        } catch {
+            throw new Error("Json wrong");
+        }
+
+        return result;
+
+    } ).then(( data ) => {
+        return data;
+    })
+
+}
+
+export {makeRequest};
