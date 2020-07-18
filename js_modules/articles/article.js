@@ -1,11 +1,11 @@
-import {makeRequest} from "../requests";
+import {server} from "../requests";
 import "@babel/polyfill";
 
 function isEmpty(obj) {
     for(var prop in obj) {
         // eslint-disable-next-line no-prototype-builtins
         if(obj.hasOwnProperty(prop)) {
-        return false;
+            return false;
         }
     }
 
@@ -14,52 +14,32 @@ function isEmpty(obj) {
 
 async function all()
 {
-    let result = await makeRequest('posts');
-    return result;
+    let result = await server.get('posts');
+    return result.data;
 }
 
 async function one(id)
 {
-    let result = await makeRequest(`posts/${id}`);
-    return result;
+    let result = await server.get(`posts/${id}`);
+    return result.data;
 }
 
 async function remove(id)
 {
-    let result = await makeRequest(`posts/${id}`, {
-        method: "DELETE"
-    });
-    return isEmpty(result);
+    let result = await server.delete(`posts/${id}`);
+    return isEmpty(result.data);
 }
 
 async function add( obj )
 {
-    let result = await makeRequest('posts', {
-        method: 'POST',
-        body: JSON.stringify(obj),
-        headers: {
-          "Content-type": "application/json; charset=UTF-8"
-        }
-      });
-
-    return result;
+    let result = await server.post('posts', obj);
+    return result.data;
 }
 
 async function edit( id, obj )
 {
-    let data = {
-        ...obj, id
-    };
-
-    let result = await makeRequest(`posts/${id}`, {
-        method: 'PUT',
-        body: JSON.stringify(data),
-        headers: {
-            "Content-type": "application/json; charset=UTF-8"
-        }
-    });
-
-    return result;
+    let result = await server.put(`posts/${id}`, { ...obj, id });
+    return result.data;
 }
 
 export {all, one, remove, add, edit};

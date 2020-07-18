@@ -1,3 +1,5 @@
+import axios from "axios";
+
 function makeRequest( route, args = {} )
 {
     return fetch(`https://jsonplaceholder.typicode.com/${route}`, args).then( (response) => {
@@ -19,4 +21,19 @@ function makeRequest( route, args = {} )
 
 }
 
-export {makeRequest};
+let server = axios.create({
+    baseURL: "https://jsonplaceholder.typicode.com/"
+})
+
+server.interceptors.request.use( request => {
+    
+    if( request.method == 'post' || request.method == 'put'){
+        request.headers = {
+          "Content-type": "application/json; charset=UTF-8"
+        };
+    }
+
+    return request;
+} )
+
+export {makeRequest, server};
