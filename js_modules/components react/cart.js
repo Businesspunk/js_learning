@@ -2,7 +2,13 @@ import React from 'react';
 // eslint-disable-next-line no-unused-vars
 import InputNumber from "./input-number";
 // eslint-disable-next-line no-unused-vars
-import { Button,Typography } from '@material-ui/core';
+import { Button,Typography, DialogTitle, Dialog, Slide } from '@material-ui/core';
+// eslint-disable-next-line no-unused-vars
+import Modal from "./modal";
+
+const Transition = React.forwardRef(function Transition(props, ref) {
+    return <Slide direction="down" ref={ref} {...props} />;
+});
 
 class Cart extends React.Component{
 
@@ -13,7 +19,10 @@ class Cart extends React.Component{
             products: [
                 { max: 10, price: 100, current: 1 },
                 { max: 5, price: 20, current: 2 }
-            ]
+            ],
+            popup: {
+                open: false
+            }
         };
     }
 
@@ -38,6 +47,13 @@ class Cart extends React.Component{
         this.setState({products});
     }
     
+    setPopupOpen( bool )
+    {
+        let popup = Object.assign( {}, this.state.popup);
+        popup.open = bool;
+        this.setState({popup});
+    }
+
     render()
     {   
         let summary = this.state.products.reduce( (result, product) => result + product.price*product.current, 0  );
@@ -60,9 +76,20 @@ class Cart extends React.Component{
                 {inputs}
                 <hr/>
                 <Typography variant="subtitle1" gutterBottom>{summary}</Typography>
-                <Button variant="contained" color="primary" onClick={ () => { this.onAdd() } }>
-                    Добавить
-                </Button>
+                <Modal title="Панель управления">
+                    <Button variant="contained" color="primary" onClick={ () => { this.onAdd() } }>
+                        Добавить
+                    </Button>
+                    <hr/>
+                    <div>
+                    <Button variant="contained" color="primary" onClick={ () => { this.setPopupOpen(true) } }>
+                        Открыть
+                    </Button>
+                    </div>
+                </Modal>
+                <Dialog TransitionComponent={Transition} open={this.state.popup.open} onClose={ () => { this.setPopupOpen(false) } } aria-labelledby="simple-dialog-title">
+                    <DialogTitle id="simple-dialog-title">Set backup account</DialogTitle>
+                </Dialog>
             </div>;
     }
 

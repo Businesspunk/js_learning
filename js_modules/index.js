@@ -1,7 +1,15 @@
 // eslint-disable-next-line no-unused-vars
-import Cart from "./components react/cart";
-import ReactDom from "react-dom";
+import Articles from "./articles-react/articles"
+import ReactDOM from "react-dom"
 // eslint-disable-next-line no-unused-vars
-import React from 'react';
+import React from "react"
+import * as Article from "./articles-react/article-model"
+import "@babel/polyfill"
 
-ReactDom.render(<Cart/>, document.querySelector('.app'));
+async function App()
+{
+    let articles = await Article.all();
+    ReactDOM.render( <Articles articles={articles}/>, document.querySelector('.app'));
+}
+
+App();
