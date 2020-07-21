@@ -1,7 +1,5 @@
 import React from "react";
-// eslint-disable-next-line no-unused-vars
 import Article from "./article-component";
-// eslint-disable-next-line no-unused-vars
 import {Button, Dialog, DialogContent, DialogTitle, DialogActions} from "@material-ui/core";
 
 class Modal extends React.Component

@@ -16,11 +16,11 @@ class Article extends React.Component
         return <Card variant="outlined">
             <CardContent>
                 <Typography  variant="h5" component="h2">{this.props.title}</Typography>
-                <Typography  color="textSecondary">{this.props.content}</Typography>
+                <Typography  color="textSecondary">{this.props.body}</Typography>
             </CardContent>
             <CardActions>
                 <Button onClick={ this.onDelete } size="small">Удалить</Button>
-                <Button size="small">Редактировать</Button>
+                <Button onClick={ this.props.openEditModal } size="small">Редактировать</Button>
             </CardActions>
         </Card>
     }

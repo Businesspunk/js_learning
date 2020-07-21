@@ -5,64 +5,58 @@ import {Typography, Button, TextField} from "@material-ui/core";
 import ModalAddArticle from "./modal-add-article-component";
 import ModalViewArticle from "./modal-view-article-component";
 import ArticlesAll from "./articles-component";
+import ModalEditArticle from "./modal-edit-article-component";
+import "@babel/polyfill";
 
 class Articles extends React.Component
 {
     constructor(obj){
         super(obj);
 
+        let popupInfo = {
+            isOpen: false,
+            content: {
+                title: "",
+                body: "",
+            },
+            article_id: null
+        };
+
         this.state = {
             articles: this.props.articles,
-            popups: {
-                addPopup: {
-                    isOpen: false,
-                    content: {
-                        title: "",
-                        body: ""
-                    }
-                },
-                viewOnePopup: {
-                    isOpen: false,
-                    content: {
-                        title: "",
-                        body: ""
-                    }
-                },
-                editOnePopup: {
-                    isOpen: false,
-                    content: {
-                        title: "",
-                        body: ""
-                    }
-                }
-                
-            }
+            popups: {}
         };
-    }
 
-    onSubmit()
-    {
-        let title = document.querySelector('#title');
-        let content = document.querySelector('#content');
-
-        this.onAdd( {title, content} );
+        let popups = ['addPopup', 'viewOnePopup', 'editOnePopup'];
+        for( let popup of popups ){
+            this.state.popups[popup] = {...popupInfo}
+        }
     }
 
     async onAdd(data)
     {
-        let title = data.title;
-        let content = data.content;
-
-        data = { title: title.value, body: content.value };
-        
         let result = await ArticleModel.add( data );
-
-        content.value = "";
-        title.value = "";
-
-        let articles =  [...this.state.articles];
+        let state = {...this.state};
+        let articles =  state.articles;
+        
         articles.unshift( result );
-        this.setState({articles});
+        state.popups.addPopup.isOpen = false;
+        this.setState(state);
+    }
+
+    async onEdit()
+    {
+        let id = this.state.popups.editOnePopup.article_id;
+        let data = this.state.popups.editOnePopup.content;
+
+        let result = await ArticleModel.edit( id+1, data );
+
+        if( result != null ){
+            let state = {...this.state};
+            Object.assign( state.articles[id], result );
+            state.popups.editOnePopup.isOpen = false;
+            this.setState(state);
+        }
     }
 
     changePopupState( popupName, bool )
@@ -82,6 +76,11 @@ class Articles extends React.Component
     changeViewOnePopup(bool)
     {
         this.changePopupState('viewOnePopup', bool);
+    }
+
+    changeEditPopupState(bool)
+    {
+        this.changePopupState('editOnePopup', bool);
     }
 
     onDelete( id )
@@ -108,9 +107,39 @@ class Articles extends React.Component
     getAddOnePopup()
     {
         return <ModalAddArticle 
-        open={this.state.popups.addPopup.isOpen}
-        onClose={ () => { this.changeAddPopupState(false) } } 
-        onOk = { () => { this.onSubmit() } }/>
+            open={this.state.popups.addPopup.isOpen}
+            onClose={ () => { this.changeAddPopupState(false) } } 
+            onOk = { (article) => { this.onAdd(article) } }
+            />
+    }
+
+    getEditOnePopup()
+    {
+        let popup = this.state.popups.editOnePopup;
+
+        return <ModalEditArticle 
+            open={popup.isOpen}
+            onClose={ () => { this.changeEditPopupState(false) } } 
+            onOk={ () => { this.onEdit() } }
+            title={ popup.content.title }
+            body={ popup.content.body }
+            onChangeTitle={ (title) => { this.onChangeEditPopupTitle(title) } }
+            onChangeBody={ (body)=>{ this.onChangeEditPopupBody(body) } }
+            />
+    }
+
+    onChangeEditPopupTitle(title)
+    {
+        let popups = {...this.state.popups };
+        popups.editOnePopup.content.title = title;
+        this.setState({popups});
+    }
+
+    onChangeEditPopupBody(body)
+    {
+        let popups = {...this.state.popups };
+        popups.editOnePopup.content.body = body;
+        this.setState({popups});
     }
 
     async onOne(id)
@@ -125,17 +154,40 @@ class Articles extends React.Component
         this.setState( {popups} );
     }
 
+    openViewModal(id)
+    {
+        let state = {...this.state};
+        let articles = state.articles;
+        let editOnePopupContent = state.popups.editOnePopup.content;
+        let article = articles[id];
+
+        editOnePopupContent.title = article.title;
+        editOnePopupContent.body = article.body;
+        
+        state.popups.editOnePopup.content = editOnePopupContent;
+        state.popups.editOnePopup.isOpen = true;
+        state.popups.editOnePopup.article_id = id;
+        
+        this.setState(state);
+    }
+
     render()
     {
-        let articles = <ArticlesAll articles={this.state.articles} onDelete={ (id) =>{ this.onDelete(id); } } /> 
+        let articles = <ArticlesAll 
+                        articles={this.state.articles} 
+                        onDelete={ (id) =>{ this.onDelete(id); } } 
+                        openEditModal={ (id)=>{ this.openViewModal(id) } }
+                        /> 
         let addArticle = this.getAddOnePopup();
         let viewOnePopup = this.getViewOnePopup();
+        let getEditOnePopup = this.getEditOnePopup();
 
         return <div>
             {viewOnePopup}
             {addArticle}
+            {getEditOnePopup}
             <Typography variant="h3" component="h1">
-                Статьи - { articles.length }
+                Статьи - { this.state.articles.length }
                 <Button onClick={ () => { this.changeAddPopupState(true); } } variant="outlined" color="primary" size="small">Добавить статью</Button>
                 <div>
                     <TextField

@@ -11,7 +11,13 @@ export default class extends React.Component
     render()
     {
         return this.props.articles.map( (item, i) => {
-            return <Article onDelete={ ()=> { this.props.onDelete(i) } } key={i} title={item.title} content={item.body} />
+            return <Article 
+                    onDelete={ ()=> { this.props.onDelete(i) } } 
+                    key={i} 
+                    title={item.title} 
+                    body={item.body} 
+                    openEditModal={ ()=> { this.props.openEditModal(i) } }
+                    />
         } );
     }
 }
