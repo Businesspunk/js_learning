@@ -3,7 +3,7 @@
 let path = require('path');
 
 let conf = {
-    entry: "./js_modules/index.js",
+    entry: "./js_modules/cart/index.js",
     output: {
         path: path.resolve(__dirname, "./js"),
         filename: "main.js",
